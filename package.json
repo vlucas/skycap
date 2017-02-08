@@ -16,7 +16,12 @@
   "author": "Vance Lucas <vance@vancelucas.com>",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.16.0",
+    "debug": "^2.6.0",
     "echotag": "^1.2.1",
-    "express": "^4.14.1"
+    "express": "^4.14.1",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0"
   }
 }

@@ -2,7 +2,10 @@
 
 const path = require('path');
 
-const config = {
+let config = {
+  adapter: null,
+
+  // Paths for templates, assets, etc.
   paths: {
     assets: path.join(__dirname, '../public'),
     templates: path.join(__dirname, 'templates')
@@ -12,13 +15,22 @@ const config = {
   routes: {
     login: '/login',
     register: '/register',
-    assets: '/_sk/assets'
+    assets: '/_sc/assets'
   },
 
   // Branding options
   brand: {
     name: 'User Auth'
+  },
+
+  errors: {
+    user_bad_email: 'Incorrect email/password combination',
+    user_bad_auth: 'Incorrect email/password combination'
   }
 };
 
-module.exports = { config };
+function mergeConfig(options) {
+  config = Object.assign(config, options);
+}
+
+module.exports = { config, mergeConfig };
