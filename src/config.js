@@ -13,9 +13,12 @@ let config = {
 
   // Public facing routes
   routes: {
-    login: '/login',
-    register: '/register',
-    assets: '/_sc/assets'
+    assets: '/_sc/assets',
+    user: {
+      login: '/login',
+      profile: '/profile',
+      register: '/register'
+    }
   },
 
   // Branding options

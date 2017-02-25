@@ -1,5 +1,7 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
+
 const config = require('./config').config;
 const SkycapAuthAdapter = require('./auth/adapter');
 
@@ -7,6 +9,11 @@ class SkycapAuth {
   constructor(adapter) {
     this.constructor.checkAdapter(adapter);
     this._adapter = adapter;
+  }
+
+  findByEmail(email) {
+    return this._adapter.findByEmail(email)
+      .then(this._formatUser);
   }
 
   findByEmailAndPassword(email, password) {
@@ -19,7 +26,7 @@ class SkycapAuth {
         }
 
         // Verify password
-        return this._verifyPassword(password)
+        return this._verifyPassword(password, user.password)
           .then(() => {
             // GOOD auth - return loaded user
             return this._formatUser(user);
@@ -49,8 +56,19 @@ class SkycapAuth {
     throw new Error(msg);
   }
 
+  _hashPassword(password) {
+    return bcrypt.hash(password, 10);
+  }
+
+  _verifyPassword(password, hashedPassword) {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
   _formatUser(user) {
-    return user; // Pass-through for now...
+    // Don't leak password hash
+    delete user.password;
+
+    return user;
   }
 
   static checkAdapter(adapter) {

@@ -1,7 +1,5 @@
 'use strict';
 
-const bcrypt = require('bcryptjs');
-
 class SkycapAuthAdapter {
   adapter(adapter) {
     this._adapter = adapter;
@@ -18,14 +16,6 @@ class SkycapAuthAdapter {
 
   error(msg) {
     throw new Error(msg);
-  }
-
-  _hashPassword(password) {
-    return bcrypt.hash(password, 10);
-  }
-
-  _verifyPassword(password, hashedPassword) {
-    return bcrypt.compare(password, hashedPassword);
   }
 
   _notImplemented(method) {

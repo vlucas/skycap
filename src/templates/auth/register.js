@@ -5,9 +5,9 @@ const tmpl = require('echotag').tmpl;
 
 function render(params = {}) {
   return tmpl`
-    <form action="${config.routes.user.login}" method="post">
+    <form action="${config.routes.user.register}" method="post">
       <fieldset>
-        <legend>User Login</legend>
+        <legend>New User Registration</legend>
 
         <div class="form-element">
           <label for="username">Email</label>
@@ -19,7 +19,7 @@ function render(params = {}) {
           <input type="password" name="password" placeholder="*********" class="form-input">
         </div>
 
-        <button type="submit" class="button button-primary">Login</button>
+        <button type="submit" class="button button-primary">Register</button>
 
       </fieldset>
     </form>
