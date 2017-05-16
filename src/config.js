@@ -16,6 +16,7 @@ let config = {
     assets: '/_sc/assets',
     user: {
       login: '/login',
+      logout: '/logout',
       profile: '/profile',
       register: '/register'
     }

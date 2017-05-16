@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const debug = require('debug')('skycap');
 const express = require('express');
 const session = require('express-session');
+const flash = require('connect-flash');
 
 const { config, mergeConfig } = require('./config');
 const SkycapAuth = require('./auth');
@@ -37,14 +38,12 @@ function mount(app, adapterClass, options) {
 
   // Passpord user serialization
   passport.serializeUser(function(user, done) {
-    debug('serializeUser: ' + user.email)
     done(null, user.email);
   });
 
   passport.deserializeUser(function(email, done) {
     authAdapter.findByEmail(email)
       .then((user) => {
-        debug('Deserialize USER =', user);
         done(null, user);
       })
       .catch((err) => {
@@ -56,13 +55,13 @@ function mount(app, adapterClass, options) {
   // Setup Passport
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(flash());
   app.use(bodyParser.urlencoded({ extended: true })); // Have to include body-parser or Passport won't pick up fields in form data
   passport.use(new LocalStrategy({
     usernameField: 'email'
   }, function(email, password, done) {
     authAdapter.findByEmailAndPassword(email, password)
       .then((user) => {
-        debug(user);
         done(null, user);
       })
       .catch((err) => {
@@ -76,10 +75,13 @@ function mount(app, adapterClass, options) {
 
   // Login
   app.get(config.routes.user.login, function (req, res) {
-    let title = 'User Login';
     let content = authLogin.render();
+    let messages = req.flash();
+    let title = 'User Login';
 
-    res.send(authLayout.render({ content, title }));
+    console.log('Flash messages =', messages);
+
+    res.send(authLayout.render({ content, messages, title }));
   });
 
   // Login process
@@ -92,8 +94,8 @@ function mount(app, adapterClass, options) {
 
   // Register
   app.get(config.routes.user.register, function (req, res) {
-    let title = 'Register New User';
     let content = authRegister.render();
+    let title = 'Register New User';
 
     res.send(authLayout.render({ content, title }));
   });
@@ -107,21 +109,35 @@ function mount(app, adapterClass, options) {
     // Register new user
     authAdapter.register(email, password, profileData)
       .then((user) => {
-        // Success - redirect to use profile
-        res.redirect(config.routes.user.profile);
+        // Log user in after successful registration
+        req.login(user, function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          // Success - redirect to user profile
+          return res.redirect(config.routes.user.profile);
+        });
       })
       .catch((err) => {
         debug(err);
-        next(err);
+        return next(err);
       });
   });
 
   // Profile
   app.get(config.routes.user.profile, auth(), function (req, res) {
+    let user = req.user;
+    let content = userProfile.render({ user });
     let title = 'User Profile';
-    let content = userProfile.render();
 
     res.send(authLayout.render({ content, title }));
+  });
+
+  // Logout
+  app.get(config.routes.user.logout, function(req, res){
+    req.logout();
+    res.redirect('/');
   });
 
   // Return Express.js middleware for mount() to work with express.use()
@@ -134,10 +150,12 @@ function mount(app, adapterClass, options) {
 function auth() {
   return function (req, res, next) {
     if (req.user) {
+      debug('Got user =', req.user);
       return next();
     }
 
     return passport.authenticate('local', {
+      failureFlash: true,
       failureRedirect: config.routes.user.login,
       successRedirect: config.routes.user.profile
     })(req, res, next);

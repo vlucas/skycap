@@ -22,6 +22,9 @@ function render(params = {}) {
         <button type="submit" class="button button-primary">Login</button>
 
       </fieldset>
+      <div>
+        <p>Don't have an account? <a href="${config.routes.user.register}">Register New User</a></p>
+      </div>
     </form>
   `;
 }
