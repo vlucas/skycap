@@ -1,0 +1,11 @@
+.userauth {
+  min-height: 90vh;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+.userauth form {
+	background-color: #eee;
+	padding: 3em;
+}

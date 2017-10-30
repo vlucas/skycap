@@ -1,6 +1,10 @@
 'use strict';
 
 class SkycapAuthAdapter {
+  get SkycapAuthAdapter () {
+    return true;
+  }
+
   adapter(adapter) {
     this._adapter = adapter;
   }

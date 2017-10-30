@@ -4,7 +4,10 @@
   "description": "Drop-in authentication and authoriztion framework for Express.js",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "start": "node __tests-server__/server.js",
+    "start:debug": "nodemon __tests-server__/server.js",
+    "test": "jest",
+    "test:debug": "jest --watch"
   },
   "keywords": [
     "authentication",
@@ -25,5 +28,16 @@
     "express-session": "^1.15.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "frisby": "^2.0.8",
+    "jest": "^20.0.4",
+    "jsdom": "^11.0.0",
+    "knex": "^0.13.0",
+    "skycap-adapter-pg": "0.0.1"
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "jsdom"
   }
 }

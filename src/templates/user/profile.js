@@ -6,6 +6,8 @@ const tmpl = require('echotag').tmpl;
 function render(params = {}) {
   let user = params.user;
 
+  console.log(user);
+
   return tmpl`
     <div>
       <p>Welcome, logged in user!</p>

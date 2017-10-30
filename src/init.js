@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 
 const { config, mergeConfig } = require('./config');
 const SkycapAuth = require('./auth');
+const SkycapUser = require('./user');
 
 // Templates
 const authLayout = require(config.paths.templates + '/layout/auth');
@@ -44,10 +45,12 @@ function mount(app, adapterClass, options) {
   passport.deserializeUser(function(email, done) {
     authAdapter.findByEmail(email)
       .then((user) => {
-        done(null, user);
+        let userObj = new SkycapUser(user);
+
+        done(null, userObj);
       })
       .catch((err) => {
-        debug('Deserialize ERROR!', err);
+        debug('User Deserialize ERROR!', err);
         done(err, null);
       });
   });
@@ -57,6 +60,7 @@ function mount(app, adapterClass, options) {
   app.use(passport.session());
   app.use(flash());
   app.use(bodyParser.urlencoded({ extended: true })); // Have to include body-parser or Passport won't pick up fields in form data
+  app.use(bodyParser.json());
   passport.use(new LocalStrategy({
     usernameField: 'email'
   }, function(email, password, done) {
@@ -79,15 +83,11 @@ function mount(app, adapterClass, options) {
     let messages = req.flash();
     let title = 'User Login';
 
-    console.log('Flash messages =', messages);
-
     res.send(authLayout.render({ content, messages, title }));
   });
 
   // Login process
-  app.post(config.routes.user.login, auth(), function (req, res) {
-    let user = req.user;
-
+  app.post(config.routes.user.login, requireUser(), function (req, res) {
     // Success - redirect to use profile
     res.redirect(config.routes.user.profile);
   });
@@ -126,7 +126,7 @@ function mount(app, adapterClass, options) {
   });
 
   // Profile
-  app.get(config.routes.user.profile, auth(), function (req, res) {
+  app.get(config.routes.user.profile, requireUser(), function (req, res) {
     let user = req.user;
     let content = userProfile.render({ user });
     let title = 'User Profile';
@@ -145,21 +145,101 @@ function mount(app, adapterClass, options) {
 }
 
 /**
- * Auth - main method of enforcing user logins and sessions
+ * Create new user object with given data
+ *
+ * @param data object
+ * @return SkycapUser
  */
-function auth() {
+function createUserObject(data) {
+  return new SkycapUser(data);
+}
+
+/**
+ * Format for API error
+ */
+function apiResponse(json, type) {
+  let output = {
+    data: {
+      type,
+      id: json.id,
+      attributes: json,
+    }
+  };
+
+  delete output.data.attributes.id;
+
+  return output;
+}
+
+/**
+ * create API error response
+ */
+function apiErrorResponse(err, statusCode = 500) {
+  let json = {
+    errors: [
+      {
+        status: String(statusCode),
+        title: err.message || err,
+      },
+    ],
+  };
+
+  return json;
+}
+
+/**
+ * Use passport auth with custom response for API
+ */
+function passportApiAuth(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    let unauthorizedStatus = 401;
+
+    if (err) {
+      return res.status(unauthorizedStatus).json(apiErrorResponse(err, unauthorizedStatus));
+    }
+
+    if (!user) {
+      return res.status(unauthorizedStatus).json(apiErrorResponse('User not logged in', unauthorizedStatus));
+    }
+
+
+    req.logIn(user, function(err) {
+      if (err) {
+        return next(err);
+      }
+
+      let userObj = createUserObject(user);
+
+      return res.status(200).json(apiResponse(userObj.toJSON(), 'user'));
+    });
+  })(req, res, next);
+}
+
+/**
+ * Main method of enforcing user logins and sessions
+ */
+function requireAdmin() {
   return function (req, res, next) {
-    if (req.user) {
-      debug('Got user =', req.user);
+    if (req.isAuthenticated() && req.user.isAdmin()) {
       return next();
     }
 
-    return passport.authenticate('local', {
-      failureFlash: true,
-      failureRedirect: config.routes.user.login,
-      successRedirect: config.routes.user.profile
-    })(req, res, next);
+    return passportApiAuth(req, res, next);
   };
 }
 
-module.exports = { auth, mount };
+/**
+ * Main method of enforcing user logins and sessions
+ */
+function requireUser() {
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      debug('User already authenticated as =', req.user);
+      return next();
+    }
+
+    return passportApiAuth(req, res, next);
+  };
+}
+
+module.exports = { requireAdmin, requireUser, mount };

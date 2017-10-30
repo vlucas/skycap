@@ -1,6 +1,6 @@
 'use strict';
 
-const { mount, auth } = require('./src/init');
+const { mount, requireAdmin, requireUser } = require('./src/init');
 const SkycapAuthAdapter = require('./src/auth/adapter');
 
-module.exports = { auth, mount, SkycapAuthAdapter };
+module.exports = { mount, requireAdmin, requireUser, SkycapAuthAdapter };

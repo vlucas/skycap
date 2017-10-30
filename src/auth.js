@@ -72,7 +72,8 @@ class SkycapAuth {
   }
 
   static checkAdapter(adapter) {
-    if (!(adapter instanceof SkycapAuthAdapter)) {
+    // Turns out, 'instanceof' SUCKS for ES6 classes (among other things), so we have to also check a named property
+    if (!(adapter instanceof SkycapAuthAdapter) && !adapter.SkycapAuthAdapter) {
       throw new Error('Skycap auth adapter set must extend SkycapAuthAdapter');
     }
   }
