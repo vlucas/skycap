@@ -13,7 +13,11 @@ class SkycapAuth {
 
   findByEmail(email) {
     return this._adapter.findByEmail(email)
-      .then(this._formatUser);
+      .then(this._formatUser)
+      .catch((err) => {
+        // No user found with email address
+        return this.error(config.errors.user_bad_email);
+      });
   }
 
   findByEmailAndPassword(email, password) {

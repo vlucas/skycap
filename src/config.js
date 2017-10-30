@@ -22,6 +22,11 @@ let config = {
     }
   },
 
+  // Redirect user to where after login?
+  redirects: {
+    loginSuccess: '/',
+  },
+
   // Branding options
   brand: {
     name: 'User Auth'

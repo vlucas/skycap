@@ -1,5 +1,6 @@
 'use strict';
 
+const accepts = require('accepts');
 const bodyParser = require('body-parser');
 const debug = require('debug')('skycap');
 const express = require('express');
@@ -51,7 +52,7 @@ function mount(app, adapterClass, options) {
       })
       .catch((err) => {
         debug('User Deserialize ERROR!', err);
-        done(err, null);
+        done(err, false, { messge: err.message });
       });
   });
 
@@ -69,8 +70,7 @@ function mount(app, adapterClass, options) {
         done(null, user);
       })
       .catch((err) => {
-        debug(err);
-        done(err, false);
+        done(err, false, { message: err.message });
       });
   }));
 
@@ -151,6 +151,7 @@ function mount(app, adapterClass, options) {
  * @return SkycapUser
  */
 function createUserObject(data) {
+  console.log('[skycap/init] createUserObject', data);
   return new SkycapUser(data);
 }
 
@@ -188,11 +189,38 @@ function apiErrorResponse(err, statusCode = 500) {
 }
 
 /**
+ * Use passport auth with redirects
+ */
+function passportRedirectAuth(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) {
+      throw err;
+    }
+
+    if (!user) {
+      // Message: User not logged in
+      return res.redirect(config.routes.user.login);
+    }
+
+
+    req.logIn(user, function(err) {
+      if (err) {
+        return next(err);
+      }
+
+      return res.redirect(config.redirects.loginSuccess);
+    });
+  })(req, res, next);
+}
+
+/**
  * Use passport auth with custom response for API
  */
 function passportApiAuth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
     let unauthorizedStatus = 401;
+    let accept = accepts(req);
+    let isJson = accept.type(['html', 'json']) === 'json';
 
     if (err) {
       return res.status(unauthorizedStatus).json(apiErrorResponse(err, unauthorizedStatus));
@@ -220,11 +248,18 @@ function passportApiAuth(req, res, next) {
  */
 function requireAdmin() {
   return function (req, res, next) {
+    let accept = accepts(req);
+    let isJson = accept.type(['html', 'json']) === 'json';
+
     if (req.isAuthenticated() && req.user.isAdmin()) {
       return next();
     }
 
-    return passportApiAuth(req, res, next);
+    if (isJson) {
+      return passportApiAuth(req, res, next);
+    } else {
+      return passportRedirectAuth(req, res, next);
+    }
   };
 }
 
@@ -233,12 +268,20 @@ function requireAdmin() {
  */
 function requireUser() {
   return function (req, res, next) {
+    let accept = accepts(req);
+    let isJson = accept.type(['html', 'json']) === 'json';
+
     if (req.isAuthenticated()) {
       debug('User already authenticated as =', req.user);
       return next();
     }
 
-    return passportApiAuth(req, res, next);
+
+    if (isJson) {
+      return passportApiAuth(req, res, next);
+    } else {
+      return passportRedirectAuth(req, res, next);
+    }
   };
 }
 
