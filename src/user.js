@@ -9,7 +9,7 @@ class SkycapUser {
 
   init() {
     if (this.json) {
-      this.data = this.json.data;
+      this.data = this.json;
     }
   }
 
