@@ -1,6 +1,6 @@
 {
   "name": "skycap",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Drop-in authentication and authoriztion framework for Express.js",
   "main": "index.js",
   "scripts": {
