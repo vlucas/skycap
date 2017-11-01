@@ -3,12 +3,26 @@
 const config = require('../../config').config;
 const tmpl = require('echotag').tmpl;
 
+function renderErrorMessages(messages = []) {
+  if (messages.length === 0) {
+    return null;
+  }
+
+  return tmpl`
+    <div class="toast toast-error">
+      ${messages.join(', ')}
+    </div>
+  `;
+}
+
 function render(params = {}) {
   return tmpl`
     <div class="userauth login">
       <form action="${config.routes.user.login}" method="post">
         <fieldset>
           <legend>User Login</legend>
+
+          ${renderErrorMessages(params.errorMessages)}:html
 
           <div class="form-group">
             <label class="form-label" for="username">Email</label>

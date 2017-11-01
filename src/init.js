@@ -2,6 +2,7 @@
 
 const accepts = require('accepts');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const debug = require('debug')('skycap');
 const express = require('express');
 const session = require('express-session');
@@ -59,6 +60,7 @@ function mount(app, adapterClass, options) {
   // Setup Passport
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(cookieParser());
   app.use(flash());
   app.use(bodyParser.urlencoded({ extended: true })); // Have to include body-parser or Passport won't pick up fields in form data
   app.use(bodyParser.json());
@@ -70,7 +72,7 @@ function mount(app, adapterClass, options) {
         done(null, user);
       })
       .catch((err) => {
-        done(err, false, { message: err.message });
+        done(null, false, { message: err.message });
       });
   }));
 
@@ -79,11 +81,11 @@ function mount(app, adapterClass, options) {
 
   // Login
   app.get(config.routes.user.login, function (req, res) {
-    let content = authLogin.render();
-    let messages = req.flash();
+    let errorMessages = req.flash('skycap_errors');
+    let content = authLogin.render({ errorMessages });
     let title = 'User Login';
 
-    res.send(authLayout.render({ content, messages, title }));
+    res.send(authLayout.render({ content, title }));
   });
 
   // Login process
@@ -193,18 +195,22 @@ function apiErrorResponse(err, statusCode = 500) {
  */
 function passportRedirectAuth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
+    let defaultMessage = config.errors.user_bad_auth;
+
     if (err) {
-      throw err;
+      req.flash('skycap_errors', err.message);
+      return next(err);
     }
 
     if (!user) {
-      // Message: User not logged in
+      req.flash('skycap_errors', info.message || defaultMessage);
       return res.redirect(config.routes.user.login);
     }
 
 
     req.logIn(user, function(err) {
       if (err) {
+        req.flash('skycap_errors', err.message);
         return next(err);
       }
 
