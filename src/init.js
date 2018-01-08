@@ -7,10 +7,12 @@ const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
 
-const { config, mergeConfig } = require('./config');
+const { config, mergeConfig, setAdapter } = require('./config');
 const { requireUser } = require('./middleware');
-const SkycapUserSDK = require('./sdk/user');
-const SkycapUser = require('./user');
+const SkycapUser = require('./skycapuser');
+
+// SDK methods (require adapter to implement them)
+const userSdk = require('./users');
 
 // Templates
 const authLayout = require(config.paths.templates + '/layout/auth');
@@ -25,19 +27,20 @@ const LocalStrategy = require('passport-local').Strategy;
 /**
  * Mount - Initialize skycap at the specified route of the Express.js app
  */
-function mount(app, adapterClass, options) {
+function mount(app, adapter, options) {
   if (options) {
     mergeConfig(options);
   }
 
-  if (!adapterClass) {
-    throw new Error('An auth adapter must be set - please specify adapterClass');
+  if (!adapter) {
+    throw new Error('An auth adapter must be set - please specify adapter');
   }
 
-  let userSdk = new SkycapUserSDK(new adapterClass())
+  // Set specified adapter
+  setAdapter(adapter);
 
-  // Setup database sessions
-  app.use(adapterClass.useSession(session, config));
+  // Setup sessions via adapter
+  app.use(adapter.session.setup(session, config));
 
   // Passpord user serialization
   passport.serializeUser(function(user, done) {
@@ -147,4 +150,4 @@ function mount(app, adapterClass, options) {
 }
 
 
-module.exports = { mount };
+module.exports = { setAdapter, mount };

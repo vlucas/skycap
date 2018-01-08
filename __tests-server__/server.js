@@ -7,10 +7,10 @@ const app = express();
 const frisby = require('frisby');
 
 const PORT = 12345;
-const SkycapAdapterPg = require('skycap-adapter-pg');
+const SkycapAdapterMemory = require('skycap-adapter-memory');
 
 // Mount skycap
-app.use(mount(app, SkycapAdapterPg));
+app.use(mount(app, SkycapAdapterMemory));
 let server = app.listen(PORT);
 
 // Frisby setup

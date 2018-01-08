@@ -1,7 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcryptjs');
-const config = require('../config');
+const config = require('./config');
 
 const cfg = config.config;
 
@@ -13,7 +13,7 @@ const cfg = config.config;
  * @return {Promise}
  */
 function findByEmail(email) {
-  return config.getAdapter().findByEmail(email)
+  return config.getAdapter().users.findByEmail(email)
     .then(_formatUser)
     .catch((err) => {
       // No user found with email address
@@ -31,7 +31,7 @@ function findByEmail(email) {
  */
 function findByEmailAndPassword(email, password) {
   // Fetch user record
-  return config.getAdapter().findByEmail(email)
+  return config.getAdapter().users.findByEmail(email)
     .then((user) => {
       if (!user || user.length === 0) {
         // No user found with email address
@@ -67,7 +67,7 @@ function findByEmailAndPassword(email, password) {
 function register(email, password, profileData = {}) {
   return _hashPassword(password)
     .then((hashedPassword) => {
-      return config.getAdapter().register(email, hashedPassword, profileData);
+      return config.getAdapter().users.register(email, hashedPassword, profileData);
     });
 }
 

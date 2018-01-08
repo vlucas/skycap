@@ -1,10 +1,9 @@
 'use strict';
 
 const path = require('path');
+let _adapter;
 
 let config = {
-  adapter: null,
-
   // Paths for templates, assets, etc.
   paths: {
     assets: path.join(__dirname, '../public'),
@@ -42,4 +41,32 @@ function mergeConfig(options) {
   config = Object.assign(config, options);
 }
 
-module.exports = { config, mergeConfig };
+/**
+ * Set adapter to use for database/persistence
+ *
+ * @param {Object} should be skycap adapter (skycap-adapter-memory, skycap-adapter-knex, etc.)
+ */
+function setAdapter(adapter) {
+  _adapter = adapter;
+}
+
+/**
+ * Get adapter that has been set
+ *
+ * @throws {Error} If adapter has not yet been set
+ * @return {Object}
+ */
+function getAdapter() {
+  if (_adapter === undefined) {
+    throw new Error('[skycap] Adapter not set! Set one using skycap.setAdapter()');
+  }
+
+  return _adapter;
+}
+
+module.exports = {
+  config,
+  mergeConfig,
+  getAdapter,
+  setAdapter,
+};
