@@ -1,16 +1,15 @@
 'use strict';
 
-const { config } = require('../src/config');
-const { mount } = require('../src/init');
 const express = require('express');
 const app = express();
 const frisby = require('frisby');
+const memoryAdapter = require('skycap-adapter-memory');
+const skycap = require('../index');
 
 const PORT = 12345;
-const SkycapAdapterPg = require('skycap-adapter-pg');
 
 // Mount skycap
-app.use(mount(app, SkycapAdapterPg));
+app.use(skycap.mount(app, memoryAdapter));
 let server = app.listen(PORT);
 
 // Frisby setup

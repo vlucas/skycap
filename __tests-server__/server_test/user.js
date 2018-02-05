@@ -1,6 +1,6 @@
 'use strict';
 
-require('../__tests-server__/test-config');
+require('../../__tests-server__/test-config');
 const { config } = require('../src/config');
 const frisby = require('frisby');
 

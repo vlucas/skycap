@@ -32,11 +32,11 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "eslint": "^4.14.0",
     "frisby": "^2.0.8",
     "jest": "^20.0.4",
     "jsdom": "^11.0.0",
-    "knex": "^0.13.0",
-    "skycap-adapter-pg": "0.0.1"
+    "skycap-adapter-memory": "^1.0.1"
   },
   "jest": {
     "verbose": true,
