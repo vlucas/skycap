@@ -7,7 +7,7 @@ let config = {
   // Paths for templates, assets, etc.
   paths: {
     assets: path.join(__dirname, '../public'),
-    templates: path.join(__dirname, 'templates')
+    templates: path.join(__dirname, 'templates'),
   },
 
   // Public facing routes
@@ -17,7 +17,7 @@ let config = {
       login: '/login',
       logout: '/logout',
       profile: '/profile',
-      register: '/register'
+      register: '/register',
     }
   },
 
@@ -28,13 +28,20 @@ let config = {
 
   // Branding options
   brand: {
-    name: 'User Auth'
+    name: 'User Auth',
   },
 
   errors: {
     user_bad_email: 'Incorrect email/password combination',
-    user_bad_auth: 'Incorrect email/password combination'
-  }
+    user_bad_auth: 'Incorrect email/password combination',
+  },
+
+  // Extension hooks for customization
+  hooks: {
+    authAfterLogin: undefined,
+    authAfterRegister: undefined,
+    userFormat: undefined,
+  },
 };
 
 function mergeConfig(options) {

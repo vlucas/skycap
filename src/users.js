@@ -42,7 +42,7 @@ function findByEmailAndPassword(email, password) {
       return _verifyPassword(password, user.password)
         .then(() => {
           // GOOD auth - return loaded user
-          return _formatUser(user);
+          return _runWithHook('authAfterLogin', _formatUser(user));
         })
         .catch((err) => {
           // Incorrect password
@@ -67,7 +67,8 @@ function findByEmailAndPassword(email, password) {
 function register(email, password, profileData = {}) {
   return _hashPassword(password)
     .then((hashedPassword) => {
-      return config.getAdapter().users.register(email, hashedPassword, profileData);
+      return config.getAdapter().users.register(email, hashedPassword, profileData)
+        .then((user) => _runWithHook('authAfterRegister', user));
     });
 }
 
@@ -87,7 +88,18 @@ function _formatUser(user) {
   // Don't leak password hash
   delete user.password;
 
-  return user;
+  return _runWithHook('userFormat', user);
+}
+
+/**
+ * Run through custom config hook if provided
+ */
+function _runWithHook(hookName, data) {
+  if (cfg.hooks && typeof cfg.hooks[hookName] === 'function') {
+    data = cfg.hooks[hookName](data);
+  }
+
+  return data;
 }
 
 module.exports = {
