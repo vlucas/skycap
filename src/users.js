@@ -46,33 +46,39 @@ function findByEmailAndPassword(email, password) {
         })
         .catch((err) => {
           // Incorrect password
-          return _error(cfg.errors.user_bad_auth);
+          return _error(cfg.errors.user_bad_auth, err);
         });
     })
     .catch((err) => {
       // No user found with email address
-      return _error(cfg.errors.user_bad_email);
+      return _error(cfg.errors.user_bad_email, err);
     });
 }
 
 /**
  * Register a new user
  *
+ * @param name {String}
  * @param email {String}
  * @param password {String}
- * @param profileData {Object}
+ * @param username {String} - Optional
+ * @param profileData {Object} - Optional additional data
  *
  * @return {Promise}
  */
-function register(email, password, profileData = {}) {
+function register(name, email, password, username = null, profileData = {}) {
   return _hashPassword(password)
     .then((hashedPassword) => {
-      return config.getAdapter().users.register(email, hashedPassword, profileData)
+      return config.getAdapter().users.register(name, email, hashedPassword, username, profileData)
         .then((user) => _runWithHook('authAfterRegister', user));
     });
 }
 
-function _error(msg) {
+function _error(msg, err = null) {
+  if (err) {
+    console.error(err);
+  }
+
   throw new Error(msg);
 }
 

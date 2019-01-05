@@ -107,12 +107,17 @@ function mount(app, adapter, options) {
 
   // Register process
   app.post(config.routes.user.register, function (req, res, next) {
-    let { email, password } = req.body;
+    let { name, email, password, username } = req.body;
     let user = req.user;
-    let profileData = null; // @TODO: Make this customizeable
+    let profileData = req.body; // @TODO: Make this customizeable
+
+    delete profileData.name;
+    delete profileData.email;
+    delete profileData.password;
+    delete profileData.username;
 
     // Register new user
-    userSdk.register(email, password, profileData)
+    userSdk.register(name, email, password, username, profileData)
       .then((user) => {
         // Log user in after successful registration
         req.login(user, function(err) {
