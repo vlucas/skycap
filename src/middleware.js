@@ -4,7 +4,7 @@ const debug = require('debug')('skycap');
 const passport = require('passport');
 
 // Local
-const { config } = require('./config');
+const { getConfig } = require('./config');
 
 /**
  * Create new user object with given data
@@ -54,6 +54,7 @@ function apiErrorResponse(err, statusCode = 500) {
  */
 function passportRedirectAuth(req, res, next) {
   passport.authenticate('local', function(err, user, info) {
+    let config = getConfig();
     let defaultMessage = config.errors.user_bad_auth;
 
     if (err) {
@@ -112,7 +113,7 @@ function passportApiAuth(req, res, next) {
  * Main method of enforcing user logins and sessions
  */
 function requireAdmin() {
-  return function (req, res, next) {
+  return function skycapMiddlewareRequireAdmin(req, res, next) {
     let accept = accepts(req);
     let isJson = accept.type(['html', 'json']) === 'json';
 
@@ -132,12 +133,11 @@ function requireAdmin() {
  * Main method of enforcing user logins and sessions
  */
 function requireUser() {
-  return function (req, res, next) {
+  return function skycapMiddlewareRequireUser(req, res, next) {
     let accept = accepts(req);
     let isJson = accept.type(['html', 'json']) === 'json';
 
     if (req.isAuthenticated()) {
-      debug('User already authenticated as =', req.user);
       return next();
     }
 
@@ -150,5 +150,36 @@ function requireUser() {
   };
 }
 
+/**
+ * Use passport to load user if possible (don't show any errors)
+ */
+function loadUser() {
+  return function skycapMiddlewareLoadUser(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) {
+        console.error('loadUser() user: ', user, info);
+        console.error('loadUser() ERROR: ', err);
+        return next(err);
+      }
+
+      if (!user) {
+        console.error('loadUser() NO USER!: ', user, info);
+        return next();
+      }
+
+      req.logIn(user, function(err) {
+        if (err) {
+          console.error('loadUser() user: ', user, info);
+          console.error('loadUser() ERROR 2: ', err);
+          return next(err);
+        }
+
+        console.error('loadUser() FOUND USER!: ', user, info);
+        return next();
+      });
+    })(req, res, next);
+  };
+}
+
 // Exports
-module.exports = { requireAdmin, requireUser };
+module.exports = { loadUser, requireAdmin, requireUser };

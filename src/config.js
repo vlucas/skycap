@@ -36,6 +36,11 @@ let config = {
     user_bad_auth: 'Incorrect email/password combination',
   },
 
+  fields: {
+    username: false,
+    custom: [],
+  },
+
   // Extension hooks for customization
   hooks: {
     authAfterLogin: undefined,
@@ -71,8 +76,17 @@ function getAdapter() {
   return _adapter;
 }
 
+/**
+ * Return config object
+ *
+ * @return {Object}
+ */
+function getConfig() {
+  return config;
+}
+
 module.exports = {
-  config,
+  getConfig,
   mergeConfig,
   getAdapter,
   setAdapter,

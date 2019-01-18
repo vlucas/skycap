@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('../../config').config;
+const config = require('../../config').getConfig();
 const tmpl = require('echotag').tmpl;
 
 function render(params = {}) {

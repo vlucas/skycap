@@ -7,12 +7,13 @@ const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
 
-const { config, mergeConfig, setAdapter } = require('./config');
+const { getConfig, mergeConfig, setAdapter } = require('./config');
 const { requireUser } = require('./middleware');
 const SkycapUser = require('./skycapuser');
 
 // SDK methods (require adapter to implement them)
 const userSdk = require('./users');
+const config = getConfig();
 
 // Templates
 const authLayout = require(config.paths.templates + '/layout/auth');
@@ -73,6 +74,7 @@ function mount(app, adapter, options) {
     userSdk.findByEmailAndPassword(email, password)
       .then((user) => {
         done(null, user);
+        return user;
       })
       .catch((err) => {
         done(null, false, { message: err.message });

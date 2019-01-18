@@ -3,7 +3,7 @@
 const bcrypt = require('bcryptjs');
 const config = require('./config');
 
-const cfg = config.config;
+const cfg = config.getConfig();
 
 /**
  * Find an existsting user by email address
@@ -69,7 +69,9 @@ function findByEmailAndPassword(email, password) {
 function register(name, email, password, username = null, profileData = {}) {
   return _hashPassword(password)
     .then((hashedPassword) => {
-      return config.getAdapter().users.register(name, email, hashedPassword, username, profileData)
+      let lowerUser = typeof username === 'string' ? username.toLowerCase() : null;
+
+      return config.getAdapter().users.register(name, email.toLowerCase(), hashedPassword, lowerUser, profileData)
         .then((user) => _runWithHook('authAfterRegister', user));
     });
 }
