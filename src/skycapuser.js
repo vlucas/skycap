@@ -2,6 +2,8 @@
 
 class SkycapUser {
   constructor(json) {
+    delete json.password;
+
     this.json = json;
 
     this.init();
@@ -25,10 +27,32 @@ class SkycapUser {
     return this.data.email;
   }
 
+  get name() {
+    return this.data.name;
+  }
+
+  get username() {
+    return this.data.username;
+  }
+
+  get is_admin() {
+    return this.data.is_admin;
+  }
+
+  get profileData() {
+    return this.data.profileData;
+  }
+
+  get dt_created() {
+    return this.data.dt_created;
+  }
+
+  get dt_updated() {
+    return this.data.dt_updated;
+  }
+
   toJSON() {
     let json = this.json;
-
-    delete json.password;
 
     return json;
   }
