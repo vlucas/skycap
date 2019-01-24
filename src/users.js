@@ -103,11 +103,13 @@ function _formatUser(user) {
  * Run through custom config hook if provided
  */
 function _runWithHook(hookName, data) {
+  let returnData;
+
   if (cfg.hooks && typeof cfg.hooks[hookName] === 'function') {
-    data = cfg.hooks[hookName](data);
+    returnData = cfg.hooks[hookName](data);
   }
 
-  return data;
+  return returnData || data;
 }
 
 module.exports = {
