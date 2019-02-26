@@ -111,7 +111,7 @@ app.get('/dashboard', requireUser(), function(req, res) {
   // Redirects to '/login' (config.routes.user.login) if user is not logged in
 });
 
-app.get('/', requireAdmin(), function(req, res) {
+app.get('/admin', requireAdmin(), function(req, res) {
   // Loads user object into 'req.user' if logged in
   // Redirects to '/login' (config.routes.user.login) if user is not logged in
   // Throws error if logged in user is not admin (req.user.isAdmin())
