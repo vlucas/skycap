@@ -13,13 +13,7 @@ const SkycapUser = require('./skycapuser');
 
 // SDK methods (require adapter to implement them)
 const userSdk = require('./users');
-const config = getConfig();
-
-// Templates
-const authLayout = require(config.paths.templates + '/layout/auth');
-const authLogin = require(config.paths.templates + '/auth/login');
-const authRegister = require(config.paths.templates + '/auth/register');
-const userProfile = require(config.paths.templates + '/user/profile');
+let config = getConfig();
 
 // Passport
 const passport = require('passport');
@@ -30,12 +24,18 @@ const LocalStrategy = require('passport-local').Strategy;
  */
 function mount(app, adapter, options) {
   if (options) {
-    mergeConfig(options);
+    config = mergeConfig(options);
   }
 
   if (!adapter) {
     throw new Error('An auth adapter must be set - please specify adapter');
   }
+
+  // Templates
+  const authLayout = require(config.paths.templates + '/layout/auth');
+  const authLogin = require(config.paths.templates + '/auth/login');
+  const authRegister = require(config.paths.templates + '/auth/register');
+  const userProfile = require(config.paths.templates + '/user/profile');
 
   // Set specified adapter
   setAdapter(adapter);

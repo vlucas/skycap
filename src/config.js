@@ -32,6 +32,9 @@ let config = {
   // Branding options
   brand: {
     name: 'User Auth',
+    href: '/',
+    css: [],
+    js: [],
   },
 
   errors: {
@@ -54,6 +57,7 @@ let config = {
 
 function mergeConfig(options) {
   config = mergeOptions(config, options);
+  return config;
 }
 
 /**

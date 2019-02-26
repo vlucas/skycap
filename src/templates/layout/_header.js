@@ -16,12 +16,13 @@ function render(params = {}) {
         <link href="${config.routes.assets}/css/spectre.min.css" rel="stylesheet" />
         <link href="${config.routes.assets}/css/skycap.css" rel="stylesheet" />
         <link href="${config.routes.assets}/css/ionicons.min.css" rel="stylesheet" />
+        ${config.brand.css ? config.brand.css.map(css => tmpl`<link href="${css}" rel="stylesheet" />`) : null}:html
       </head>
       <body>
         <div class="container">
           <header class="navbar">
             <section class="navbar-section">
-              <a href="#" class="navbar-brand mr-2"><i class="ion-person"></i> ${config.brand.name}</a>
+              <a href="${config.brand.href}" class="navbar-brand mr-2"><i class="ion-person"></i> ${config.brand.name}</a>
             </section>
             <section class="navbar-section">
               &nbsp;
