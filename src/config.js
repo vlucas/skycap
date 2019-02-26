@@ -24,6 +24,7 @@ let config = {
   // Redirect user to where after login?
   redirects: {
     loginSuccess: '/',
+    registerSuccess: '/',
   },
 
   // Branding options

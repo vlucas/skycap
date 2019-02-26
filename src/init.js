@@ -128,7 +128,7 @@ function mount(app, adapter, options) {
           }
 
           // Success - redirect to user profile
-          return res.redirect(config.routes.user.profile);
+          return res.redirect(config.redirects.registerSuccess || config.routes.user.profile);
         });
       })
       .catch((err) => {
