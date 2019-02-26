@@ -28,11 +28,41 @@ Require it in your Express.js Node service, and mount it with `app.use`:
 const skycap = require('skycap');
 const skycapKnex = require('skycap-adapter-knex');
 
+// Skycap custom config
+const skycapConfig = {
+  brand: {
+    name: 'MySite, Inc.',
+    href: '/',
+    css: [
+      '/css/bootstrap.min.css',
+      '/css/main.css',
+    ],
+    js: [
+      '/js/yayquery.js',
+    ],
+  },
+  fields: {
+    username: true, // false by default (email-only login)
+  },
+  hooks: {
+    authAfterRegister: async function _afterUserRegister(user) { // after successful user registration
+      // Add user's email to a mailing list? Maybe? Dunno.
+      return user; // Don't forget to return the user object!
+    },
+    authAfterLogin: undefined, // after successful user login
+    userFormat: undefined, // Format the user object from raw data
+  },
+  redirects: {
+    loginSuccess: '/dashboard',
+    registerSuccess: '/dashboard/?newuser=true',
+  },
+};
+
 // Set your Knex.js connection instance
 skycapKnex.setConnection(knex); // Where 'knex' is your Knex.js connection
 
 // Mount Skycap with Express.js
-app.use(skycap.mount(app, skycapKnex));
+app.use(skycap.mount(app, skycapKnex, skycapConfig));
 ```
 
 ### Database Migrations
