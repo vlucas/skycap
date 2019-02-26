@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const mergeOptions = require('merge-options');
 let _adapter;
 
 let config = {
@@ -23,6 +24,7 @@ let config = {
 
   // Redirect user to where after login?
   redirects: {
+    home: '/',
     loginSuccess: '/',
     registerSuccess: '/',
   },
@@ -51,7 +53,7 @@ let config = {
 };
 
 function mergeConfig(options) {
-  config = Object.assign(config, options);
+  config = mergeOptions(config, options);
 }
 
 /**
