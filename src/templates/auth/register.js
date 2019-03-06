@@ -26,7 +26,7 @@ function render(params = {}) {
 
           <div class="form-group">
             <label class="form-label" for="email">Email</label>
-            <input class="form-input" type="text" name="email" placeholder="user@example.com" style="text-transform: lowercase" required>
+            <input class="form-input" type="email" name="email" placeholder="user@example.com" style="text-transform: lowercase" required>
           </div>
 
           <div class="form-group">

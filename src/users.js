@@ -40,13 +40,14 @@ function findByEmailAndPassword(email, password) {
 
       // Verify password
       return _verifyPassword(password, user.password)
-        .then(() => {
-          // GOOD auth - return loaded user
-          return _runWithHook('authAfterLogin', _formatUser(user));
-        })
-        .catch((err) => {
-          // Incorrect password
-          return _error(cfg.errors.user_bad_auth, err);
+        .then((result) => {
+          if (result) {
+            // GOOD auth - return loaded user
+            return _runWithHook('authAfterLogin', _formatUser(user));
+          } else {
+            // Incorrect password
+            return _error(cfg.errors.user_bad_auth, err);
+          }
         });
     })
     .catch((err) => {

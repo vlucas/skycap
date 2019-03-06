@@ -157,24 +157,18 @@ function loadUser() {
   return function skycapMiddlewareLoadUser(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
       if (err) {
-        console.error('loadUser() user: ', user, info);
-        console.error('loadUser() ERROR: ', err);
         return next(err);
       }
 
       if (!user) {
-        console.error('loadUser() NO USER!: ', user, info);
         return next();
       }
 
       req.logIn(user, function(err) {
         if (err) {
-          console.error('loadUser() user: ', user, info);
-          console.error('loadUser() ERROR 2: ', err);
           return next(err);
         }
 
-        console.error('loadUser() FOUND USER!: ', user, info);
         return next();
       });
     })(req, res, next);

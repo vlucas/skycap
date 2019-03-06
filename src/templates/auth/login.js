@@ -26,12 +26,12 @@ function render(params = {}) {
 
           <div class="form-group">
             <label class="form-label" for="username">Email</label>
-            <input type="text" name="email" placeholder="user@example.com" class="form-input">
+            <input type="email" name="email" placeholder="user@example.com" class="form-input" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="password">Password</label>
-            <input type="password" name="password" placeholder="*********" class="form-input">
+            <input type="password" name="password" placeholder="*********" class="form-input" required>
           </div>
 
           <button type="submit" class="btn btn-primary">Login</button>
