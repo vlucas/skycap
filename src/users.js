@@ -1,6 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcryptjs');
+const usernameBlacklist = require('the-big-username-blacklist');
 const config = require('./config');
 
 const cfg = config.getConfig();
@@ -71,6 +72,11 @@ function register(name, email, password, username = null, profileData = {}) {
   return _hashPassword(password)
     .then((hashedPassword) => {
       let lowerUser = typeof username === 'string' ? username.toLowerCase() : null;
+
+      // Ensure username is not on blacklist
+      if (lowerUser && !usernameBlacklist.validate(lowerUser)) {
+        throw new Error('Username is not allowed. Please choose a different username.');
+      }
 
       return config.getAdapter().users.register(name, email.toLowerCase(), hashedPassword, lowerUser, profileData)
         .then((user) => _runWithHook('authAfterRegister', user));

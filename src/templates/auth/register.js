@@ -8,7 +8,7 @@ function render(params = {}) {
   let usernameField = hasUsernameField ? tmpl`
     <div class="form-group">
       <label class="form-label" for="username">Username</label>
-      <input class="form-input" type="text" name="username" placeholder="johndoe" style="text-transform: lowercase" required>
+      <input class="form-input" type="text" name="username" placeholder="johndoe" style="text-transform: lowercase" pattern="[A-Za-z0-9]+" required>
     </div>
   ` : '';
 
