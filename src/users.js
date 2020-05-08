@@ -2,6 +2,9 @@
 
 const bcrypt = require('bcryptjs');
 const usernameBlacklist = require('the-big-username-blacklist');
+// More bad usernames not currently on the big username blacklist
+const skycapBlacklist = ['default', 'primary', 'secondary'];
+
 const config = require('./config');
 
 const cfg = config.getConfig();
@@ -74,7 +77,7 @@ function register(name, email, password, username = null, profileData = {}) {
       let lowerUser = typeof username === 'string' ? username.toLowerCase() : null;
 
       // Ensure username is not on blacklist
-      if (lowerUser && !usernameBlacklist.validate(lowerUser)) {
+      if (lowerUser && !_isValidUsername(lowerUser)) {
         throw new Error('Username is not allowed. Please choose a different username.');
       }
 
@@ -104,6 +107,10 @@ function _formatUser(user) {
   delete user.password;
 
   return _runWithHook('userFormat', user);
+}
+
+function _isValidUsername(username) {
+  return usernameBlacklist.validate(username) && !skycapBlacklist.includes(username);
 }
 
 /**

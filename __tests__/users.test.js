@@ -76,7 +76,7 @@ describe('users', function () {
     let name = 'Testy McTesterpants';
     let email = 'user@example.com';
     let hashedPassword = 'abc123';
-    let username = 'www';
+    let username = 'default';
     let profileData = {};
 
     return users.register(name, email, hashedPassword, username, profileData)
